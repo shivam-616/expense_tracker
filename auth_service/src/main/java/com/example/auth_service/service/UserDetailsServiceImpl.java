@@ -1,6 +1,8 @@
 package com.example.auth_service.service;
 
 import com.example.auth_service.entities.UserInfo;
+import com.example.auth_service.eventProducer.UserInfoEvent;
+import com.example.auth_service.eventProducer.UserInfoProducer;
 import com.example.auth_service.model.UserInfoDto;
 import com.example.auth_service.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -12,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Component;;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -29,6 +31,10 @@ public class UserDetailsServiceImpl implements UserDetailsService
 
     @Autowired
     private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private final UserInfoProducer userInfoProducer;
+    @Autowired
 
 
     private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
@@ -50,16 +56,31 @@ public class UserDetailsServiceImpl implements UserDetailsService
     public UserInfo checkIfUserAlreadyExist(UserInfoDto userInfoDto){
         return userRepository.findByUsername(userInfoDto.getUsername());
     }
-
     public Boolean signupUser(UserInfoDto userInfoDto){
-        //        ValidationUtil.validateUserAttributes(userInfoDto);
+        // ValidationUtil.validateUserAttributes(userInfoDto);
         userInfoDto.setPassword(passwordEncoder.encode(userInfoDto.getPassword()));
+
         if(Objects.nonNull(checkIfUserAlreadyExist(userInfoDto))){
             return false;
         }
+
+        // 1. Generate the UUID
         String userId = UUID.randomUUID().toString();
+
+        // 2. Save to the Auth Database
         userRepository.save(new UserInfo(userId, userInfoDto.getUsername(), userInfoDto.getPassword(), new HashSet<>()));
-        // pushEventToQueue
+
+        // 3. Construct the Kafka Event
+        UserInfoEvent event =new UserInfoEvent();
+        event.setUserId(userId); // <-- CHANGED: Simply use the userId string we generated above
+        event.setFirstName(userInfoDto.getFirstName());
+        event.setLastName(userInfoDto.getLastName());
+        event.setEmail(userInfoDto.getEmail());
+        event.setPhoneNumber(userInfoDto.getPhoneNumber());
+
+        // 4. Send the event to Kafka!
+        userInfoProducer.sendEventTokafka(event);
+
         return true;
     }
 }

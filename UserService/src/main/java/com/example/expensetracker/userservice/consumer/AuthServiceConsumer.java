@@ -25,6 +25,7 @@ public class AuthServiceConsumer {
     public void listen(userinfoDto eventdata) {
         try {
             //
+            System.out.println("listing to the evenet");
             userservice.createOrUpdateUser(eventdata);
         } catch (Exception e) {
             e.printStackTrace();

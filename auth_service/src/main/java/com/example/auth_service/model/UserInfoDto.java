@@ -1,20 +1,28 @@
 package com.example.auth_service.model;
 
 import com.example.auth_service.entities.UserInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@JsonNaming ()
-
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserInfoDto extends UserInfo
 {
+    @JsonProperty("first_name")
+    private String firstName;
 
-    private String firstName; // first_name
+    @JsonProperty("last_name")
+    private String lastName;
 
-    private String lastName; //last_name
+    @JsonProperty("phone_number")
+    private long phoneNumber;
 
-    private Long phoneNumber;
-
-    private String email; // email
+    @JsonProperty("email")
+    private String email;
 
 
 }

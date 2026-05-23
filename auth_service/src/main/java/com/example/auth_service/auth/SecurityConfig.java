@@ -2,6 +2,7 @@
 
 import  com.example.auth_service.auth.JwtAuthFilter;
 import com.example.auth_service.auth.JwtAuthFilter;
+import com.example.auth_service.eventProducer.UserInfoProducer;
 import com.example.auth_service.repository.UserRepository;
 import com.example.auth_service.service.UserDetailsServiceImpl;
 import lombok.AllArgsConstructor;
@@ -38,8 +39,8 @@ public class SecurityConfig {
 
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        return new UserDetailsServiceImpl(userRepository, passwordEncoder);
+    public UserDetailsService userDetailsService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserInfoProducer userInfoProducer) {
+        return   new UserDetailsServiceImpl(userRepository, passwordEncoder,userInfoProducer );
     }
 
     @Bean
