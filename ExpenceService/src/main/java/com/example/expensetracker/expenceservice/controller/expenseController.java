@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 @Controller
@@ -25,7 +24,7 @@ public class expenseController {
 
     //need sevice for business logic
 
-    private expenseService expenseService;
+    private final  expenseService expenseService;
 
 
     //insight
@@ -38,7 +37,7 @@ public class expenseController {
         addDTO userEntry = new addDTO(
                 userId,
                 entrydetail.merchant(),
-                entrydetail.curreny(),
+                entrydetail.currency(),
                 entrydetail.externalId(),
                 entrydetail.amount(),
                 entrydetail.category(),
@@ -73,7 +72,7 @@ public class expenseController {
         addDTO userEntry = new addDTO(
                 userId,
                 entrydetail.merchant(),
-                entrydetail.curreny(),
+                entrydetail.currency(),
                 entrydetail.externalId(),
                 entrydetail.amount(),
                 entrydetail.category(),

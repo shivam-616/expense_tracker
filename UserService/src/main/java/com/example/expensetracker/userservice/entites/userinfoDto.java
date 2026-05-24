@@ -3,8 +3,9 @@ package com.example.expensetracker.userservice.entites;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
-import tools.jackson.databind.PropertyNamingStrategies;
-import tools.jackson.databind.annotation.JsonNaming;
+
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -23,7 +24,7 @@ public record userinfoDto (
         @JsonProperty("email")
         String email,
         @JsonProperty("phone_number")
-        long phoneNumber,
+        Long phoneNumber,
         @JsonProperty("profile_pc")
         String profilePic
 

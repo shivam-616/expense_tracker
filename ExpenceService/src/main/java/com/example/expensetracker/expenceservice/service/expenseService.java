@@ -4,17 +4,17 @@ package com.example.expensetracker.expenceservice.service;
 import com.example.expensetracker.expenceservice.entites.expense;
 import com.example.expensetracker.expenceservice.repository.expenseRepo;
 import com.example.expensetracker.expenceservice.requestDTO.addDTO;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.ObjectMapper;
+
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -34,9 +34,9 @@ public class expenseService {
             expense newExpense = objectMapper.convertValue(entrydetail, expense.class);
 
             // 2. Set the currency
-            newExpense.setCurrency(entrydetail.curreny() != null ? entrydetail.curreny() : "INR");
+            newExpense.setCurrency(entrydetail.currency() != null ? entrydetail.currency() : "INR");
             newExpense.setUserId(entrydetail.userID()); // Ensure UserID is mapped
-
+            newExpense.setCategory(entrydetail.category());
             // 3. Save it
             expenserepo.save(newExpense);
             return true;
@@ -47,11 +47,21 @@ public class expenseService {
     }
 
     public List<addDTO> getExpense(String userID) {
-        List<expense> ls = expenserepo.findByUserId(userID);
-        return objectMapper.convertValue(ls,
-                new TypeReference<List<addDTO>>() {
-                });
+        // 1. Fetch the data from the database
+        List<expense> expenses = expenserepo.findByUserId(userID);
+
+        // 2. Manually and safely map it to the DTO so Jackson doesn't crash!
+        return expenses.stream().map(exp -> new addDTO(
+                exp.getUserId(),
+                exp.getMerchant() != null ? exp.getMerchant() : "Unknown",
+                exp.getCurrency() != null ? exp.getCurrency() : "INR",
+                exp.getExternalId(),
+                exp.getAmount() != null ? exp.getAmount() : java.math.BigDecimal.ZERO,
+                exp.getCategory() != null ? exp.getCategory() : "Uncategorized",
+                exp.getCreatedAt()
+        )).toList();
     }
+
 
     public boolean updateexpense(String userID, addDTO entrydetail) {
         Optional<expense> expenseFoundOpt = expenserepo.findByUserIdAndExternalId(userID, entrydetail.externalId());
@@ -69,8 +79,8 @@ public class expenseService {
             existingExpense.setMerchant(entrydetail.merchant());
         }
 
-        if (entrydetail.curreny() != null && !entrydetail.curreny().trim().isEmpty()) {
-            existingExpense.setCurrency(entrydetail.curreny());
+        if (entrydetail.currency() != null && !entrydetail.currency().trim().isEmpty()) {
+            existingExpense.setCurrency(entrydetail.currency());
         } else {
             existingExpense.setCurrency("INR");
         }

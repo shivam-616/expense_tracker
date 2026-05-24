@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +23,17 @@ public class ExpenseConsumer {
     }
 
     @KafkaListener(topics = "${spring.kafka.topic-json.name}", groupId = "${spring.kafka.consumer.group-id}")
-    public void listen(addDTO eventData) {
-        try {
+    public void listen(@Payload addDTO eventData ,@Header(KafkaHeaders.RECEIVED_KEY) String userId) {
+        try {addDTO enrichedData = new addDTO(
+                userId, // <-- This ensures it is no longer NULL!
+                eventData.merchant(),
+                eventData.currency(),
+                eventData.externalId(),
+                eventData.amount(),
+                eventData.category(),
+                eventData.date()
+        );
+
             // Todo: Make it transactional, and check if duplicate event (Handle idempotency)
             expenseService.saveExpense(eventData);
         } catch (Exception ex) {

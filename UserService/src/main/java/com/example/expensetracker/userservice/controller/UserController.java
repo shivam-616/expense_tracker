@@ -23,7 +23,7 @@ public class UserController {
     private userservicerepo userservicerepo;
 
     @PostMapping("/user/v1/createUpdate")
-    public ResponseEntity<userinfoDto> createUpdateUser(userinfoDto eventdata){
+    public ResponseEntity<userinfoDto> createUpdateUser(@RequestBody userinfoDto eventdata){
         try {
             userinfoDto user = userService.createOrUpdateUser(eventdata);
             return new ResponseEntity<>(user, HttpStatus.OK);

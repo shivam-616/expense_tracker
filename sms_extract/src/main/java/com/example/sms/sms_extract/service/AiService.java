@@ -23,12 +23,15 @@ public class AiService {
     private ChatClient chatClient;
     private SmsPreprocessingService smsPreprocessingService;
     private smsdataProducer smsdataProducer;
+
+
     // Standard constructor injection (Better than using both Lombok @AllArgs and @NoArgs)
-    public AiService(AiRepository aiRepository, ChatClient chatClient, SmsPreprocessingService smsPreprocessingService) {
+    public AiService(AiRepository aiRepository, ChatClient chatClient, SmsPreprocessingService smsPreprocessingService,smsdataProducer smsdataProducer) {
         this.aiRepository = aiRepository;
         this.chatClient = chatClient;
         this.smsPreprocessingService = smsPreprocessingService;
-    }
+        this.smsdataProducer = smsdataProducer;
+}
 
 
     @Value("classpath:/templates/sms-extraction.st")
@@ -39,10 +42,21 @@ public class AiService {
         if (cleanedSms == null) {
             throw new RuntimeException("Invalid or non-transaction SMS");
         }
-
         TransactionDetailsDTO result = chatClient.prompt()
                 .user(u -> u.text(resource).param("sms_text", cleanedSms))
                 .call().entity(TransactionDetailsDTO.class);
+
+        Sms smsRecord = new Sms();
+        smsRecord.setRaw_sms(sms);
+        smsRecord.set_transaction(result.is_transaction());
+        smsRecord.setAmount(result.amount());
+        smsRecord.setMerchant(result.merchant());
+        smsRecord.setCategory(result.category());
+        smsRecord.setCurrency(result.currency());
+        // (You can set the rest of the fields here too!)
+
+        aiRepository.save(smsRecord);
+
 
         smsdataProducer.sendEventToKafka( userId , result);
     }

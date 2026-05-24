@@ -44,6 +44,8 @@ public class expense {
 
     @Column(name = "currency")
     private String currency;
+    @Column(name = "category")
+    private String category;
 
     @Column(name = "external_id")
     private String externalId;

@@ -3,17 +3,12 @@
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import  com.example.auth_service.entities.UserInfo;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.mapping.ToOne;
 
 import java.time.Instant;
 
@@ -28,13 +23,12 @@ public class RefreshToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int id; // <-- Back to an auto-incrementing integer
 
     private String token;
-
     private Instant expiryDate;
 
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "user_id")
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     private UserInfo userInfo;
 }

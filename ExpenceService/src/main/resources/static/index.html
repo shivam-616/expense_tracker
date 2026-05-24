@@ -95,7 +95,7 @@
             externalId: document.getElementById('add-extId').value,
             merchant: document.getElementById('add-merchant').value,
             amount: parseFloat(document.getElementById('add-amount').value),
-            curreny: document.getElementById('add-currency').value, // Matches DTO typo
+            currency: document.getElementById('add-currency').value, // Matches DTO typo
             category: document.getElementById('add-category').value,
             date: document.getElementById('add-date').value ? new Date(document.getElementById('add-date').value).toISOString() : new Date().toISOString()
         };
@@ -135,7 +135,7 @@
             externalId: document.getElementById('upd-extId').value,
             merchant: document.getElementById('upd-merchant').value,
             amount: parseFloat(document.getElementById('upd-amount').value),
-            curreny: document.getElementById('upd-currency').value // Matches DTO typo
+            currency: document.getElementById('upd-currency').value // Matches DTO typo
         };
 
         try {
