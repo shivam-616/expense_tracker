@@ -63,8 +63,31 @@ public class AiService {
         smsRecord.setStatus(result.status());
 
         aiRepository.save(smsRecord);
+        String bulletproofReferenceId = result.reference_id();
 
+        if (bulletproofReferenceId == null || bulletproofReferenceId.trim().isEmpty()) {
+            // Generate a guaranteed unique ID using our database primary key!
+            bulletproofReferenceId = "SYS_SMS_" + smsRecord.getSms_id();
 
+            // Update the database record so it matches Kafka exactly, then re-save
+            smsRecord.setReference_id(bulletproofReferenceId);
+            aiRepository.save(smsRecord);
+        }
+        TransactionDetailsDTO kafkaPayload = new TransactionDetailsDTO(
+                result.is_transaction(),
+                result.amount(),
+                result.currency(),
+                result.merchant(),
+                result.category(),
+                result.payment_method(),
+                result.bank(),
+                result.account_last4(),
+                bulletproofReferenceId, // <-- The guaranteed ID goes here!
+                result.timestamp(),
+                result.balance(),
+                result.status(),
+                result.raw_sms()
+        );
         smsdataProducer.sendEventToKafka( userId , result);
     }
 
