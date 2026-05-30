@@ -3,15 +3,19 @@ package com.example.expensetracker.expenceservice.service;
 
 import com.example.expensetracker.expenceservice.entites.expense;
 import com.example.expensetracker.expenceservice.repository.expenseRepo;
+import com.example.expensetracker.expenceservice.requestDTO.CategoryInsightDto;
 import com.example.expensetracker.expenceservice.requestDTO.addDTO;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
+
 
 
 import java.util.List;
@@ -46,9 +50,11 @@ public class expenseService {
         }
     }
 
-    public List<addDTO> getExpense(String userID) {
+    public List<addDTO> getExpense(String userID , Pageable pageable) {
         // 1. Fetch the data from the database
-        List<expense> expenses = expenserepo.findByUserId(userID);
+
+        Page<expense> expensePage = expenserepo.findByUserId(userID ,pageable);
+        List<expense> expenses = expensePage.getContent();
 
         // 2. Manually and safely map it to the DTO so Jackson doesn't crash!
         return expenses.stream().map(exp -> new addDTO(
@@ -87,5 +93,9 @@ public class expenseService {
 
         expenserepo.save(existingExpense);
         return true;
+    }
+
+    public List<CategoryInsightDto> getinsight(String userId){
+        return expenserepo.getCategoryInsights(userId);
     }
 }

@@ -48,6 +48,7 @@ public class TokenController
 
     @PostMapping("auth/v1/refreshToken")
     public JwtResponseDTO refreshToken(@RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO){
+
         return refreshTokenService.findByToken(refreshTokenRequestDTO.getToken())
                 .map(refreshTokenService::verifyExpiration)
                 .map(RefreshToken::getUserInfo)

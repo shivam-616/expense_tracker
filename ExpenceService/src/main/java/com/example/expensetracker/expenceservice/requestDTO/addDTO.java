@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record addDTO(
         // for manual entry from the user
-       String userID,
+        String userID,
         @NonNull String merchant,
         @NonNull String currency,
         @JsonProperty("external_id") String externalId,

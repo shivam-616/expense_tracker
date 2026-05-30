@@ -1,5 +1,25 @@
 _format_version: "3.0"
 
+
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Content-Type
+        - Authorization
+      credentials: true
+      max_age: 3600
+
 services:
   # --- 1. AUTH SERVICE ---
   - name: auth-service

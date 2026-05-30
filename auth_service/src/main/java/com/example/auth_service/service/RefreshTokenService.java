@@ -22,6 +22,11 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(String username){
         UserInfo userInfoExtracted = userRepository.findByUsername(username);
+
+        Optional<RefreshToken> existingToken = refreshTokenRepository.findByUserInfo(userInfoExtracted);
+        if(existingToken.isPresent()) {
+            refreshTokenRepository.delete(existingToken.get());
+        }
         RefreshToken refreshToken = RefreshToken.builder()
                     .userInfo(userInfoExtracted)
                     .token(UUID.randomUUID().toString())

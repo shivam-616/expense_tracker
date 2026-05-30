@@ -35,7 +35,7 @@ public class ExpenseConsumer {
         );
 
             // Todo: Make it transactional, and check if duplicate event (Handle idempotency)
-            expenseService.saveExpense(eventData);
+            expenseService.saveExpense(enrichedData);
         } catch (Exception ex) {
             ex.printStackTrace();
             System.out.println("AuthServiceConsumer: Exception is thrown while consuming kafka event");
